@@ -1,0 +1,16 @@
+{
+  "name": "isincountry-api",
+  "version": "1.0.0",
+  "description": "IsInCountry SDK API Service",
+  "scripts": {
+    "start": "gunicorn --bind 0.0.0.0:$PORT server.app:app",
+    "dev": "python server/app.py"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/isincountry-sdk"
+  },
+  "keywords": ["geolocation", "api", "countries", "coordinates"],
+  "author": "Your Name",
+  "license": "MIT"
+}
