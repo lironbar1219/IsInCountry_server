@@ -207,7 +207,7 @@ SECRET_KEY=your-secret-key
 FLASK_ENV=production
 FLASK_DEBUG=False
 PORT=5000
-CORS_ORIGINS=* 
+CORS_ORIGINS=*
 ```
 
 ### Local Development (.env file)
