@@ -1,0 +1,179 @@
+/* Admin Portal Custom Styles */
+
+body {
+    background-color: #f8f9fa;
+}
+
+.navbar-brand {
+    font-weight: bold;
+}
+
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0 !important;
+    font-weight: 600;
+}
+
+.btn {
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-warning:hover,
+.btn-outline-success:hover {
+    transform: translateY(-1px);
+}
+
+.alert {
+    border-radius: 8px;
+    border: none;
+}
+
+.modal-content {
+    border-radius: 10px;
+    border: none;
+}
+
+.form-control {
+    border-radius: 6px;
+}
+
+.table {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.country-item {
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.country-code {
+    font-weight: bold;
+    color: #0d6efd;
+}
+
+.admin-item {
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.admin-username {
+    font-weight: bold;
+    color: #ffc107;
+}
+
+.admin-email {
+    font-size: 0.9rem;
+}
+
+.loading {
+    text-align: center;
+    padding: 20px;
+    color: #6c757d;
+}
+
+.stats-item {
+    text-align: center;
+    padding: 10px;
+}
+
+.stats-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #0d6efd;
+}
+
+.stats-label {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 15px;
+    }
+
+    .card {
+        margin-bottom: 20px;
+    }
+}
+
+/* Animation for success operations */
+.success-flash {
+    animation: successPulse 0.6s ease-in-out;
+}
+
+@keyframes successPulse {
+    0% { background-color: transparent; }
+    50% { background-color: #d4edda; }
+    100% { background-color: transparent; }
+}
+
+/* Floating alerts animations */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Floating alerts container */
+#floating-alerts {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 400px;
+    pointer-events: none;
+}
+
+#floating-alerts .alert {
+    pointer-events: all;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    border: none;
+    border-radius: 8px;
+}
+
+/* Responsive floating alerts */
+@media (max-width: 768px) {
+    #floating-alerts {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}

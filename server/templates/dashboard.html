@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Country API Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h2>
+        <p class="text-muted">Manage your Country API database and settings</p>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Database Management -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-database"></i> Database Management</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-success" onclick="initDatabase()">
+                        <i class="fas fa-play"></i> Initialize Database
+                    </button>
+                    <button class="btn btn-warning" onclick="cleanDatabase()">
+                        <i class="fas fa-broom"></i> Clean Database
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Country Management -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-globe"></i> Country Management</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCountryModal">
+                        <i class="fas fa-plus"></i> Add Country
+                    </button>
+                    <button class="btn btn-outline-primary" onclick="loadCountries()">
+                        <i class="fas fa-list"></i> View Countries
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Management -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5><i class="fas fa-users-cog"></i> Admin Management</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-warning" onclick="initAdmins()">
+                        <i class="fas fa-user-plus"></i> Initialize Admin Table
+                    </button>
+                    <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#addAdminModal">
+                        <i class="fas fa-user-plus"></i> Add Admin
+                    </button>
+                    <button class="btn btn-outline-warning" onclick="loadAdmins()">
+                        <i class="fas fa-users"></i> View Admins
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5><i class="fas fa-chart-bar"></i> Statistics</h5>
+            </div>
+            <div class="card-body">
+                <div id="stats-content">
+                    <p class="text-muted">Loading statistics...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Countries List -->
+<div class="row" id="countries-section" style="display: none;">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-list"></i> Countries</h5>
+            </div>
+            <div class="card-body">
+                <div id="countries-list"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Admins List -->
+<div class="row" id="admins-section" style="display: none;">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-users"></i> Admin Users</h5>
+            </div>
+            <div class="card-body">
+                <div id="admins-list"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Country Modal -->
+<div class="modal fade" id="addCountryModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-plus"></i> Add Country</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addCountryForm">
+                    <div class="mb-3">
+                        <label for="countryCode" class="form-label">Country Code (3 letters)</label>
+                        <input type="text" class="form-control" id="countryCode" maxlength="3" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="countryName" class="form-label">Country Name</label>
+                        <input type="text" class="form-control" id="countryName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="polygonData" class="form-label">Polygon Data (GeoJSON)</label>
+                        <textarea class="form-control" id="polygonData" rows="10" placeholder='{"type": "Polygon", "coordinates": [[[lon1, lat1], [lon2, lat2], ...]]}'></textarea>
+                        <div class="form-text">Enter valid GeoJSON polygon coordinates</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="addCountry()">Add Country</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Admin Modal -->
+<div class="modal fade" id="addAdminModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-user-plus"></i> Add Admin</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addAdminForm">
+                    <div class="mb-3">
+                        <label for="adminUsername" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="adminUsername" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="adminPassword" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="adminPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="adminEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="adminEmail">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-warning" onclick="addAdmin()">Add Admin</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Load statistics on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadStatistics();
+});
+</script>
+{% endblock %}

@@ -1,213 +1,246 @@
-# IsInCountry API Service
+# Country API Service
 
-A REST API service for checking if coordinates are within specific country boundaries. This server provides the backend for the IsInCountry SDK.
+A REST API service for checking if coordinates are within specific country boundaries us## Local Developmentng precise polygon geometry. Features include a comprehensive admin portal for database management and country administration.
 
-## 🚀 Quick Start
+## Features
 
-### 1. Local Development
+- **Point-in-Polygon Validation**: Check if coordinates fall within country boundaries
+- **Admin Portal**: Web-based interface for managing countries and admin users
+- **Database Management**: Initialize, clean, and manage country data
+- **Authentication System**: Secure admin access with session management
+- **RESTful API**: Clean endpoints for integration
+- **Production Ready**: Deployed on Railway with PostgreSQL
 
-```bash
-# Start PostgreSQL database
-cd server
-docker-compose up -d
+## API Endpoints
 
-# Install dependencies
-pip install -r requirements.txt
+### Public API
 
-# Load sample countries
-python data_loader.py
+**Base URL**: `https://poetic-elegance-production-2172.up.railway.app`
 
-# Start the server
-python app.py
-```
-
-### 2. Deploy to Cloud
-
-```bash
-# Deploy to Railway (Recommended)
-./deploy.sh
-
-# Or see DEPLOYMENT.md for other options
-```
-
-## 📁 Project Structure
-
-```
-isincountry-api/
-├── server/                 # Python Flask API
-│   ├── app.py             # Main Flask application
-│   ├── data_loader.py     # Load country data
-│   ├── auto_loader.py     # Auto-fetch countries from APIs
-│   ├── requirements.txt   # Python dependencies
-│   ├── docker-compose.yml # PostgreSQL setup
-│   └── .env              # Environment variables
-├── docs/                  # API documentation
-├── DEPLOYMENT.md         # Deployment guide
-└── deployment files      # Cloud deployment configs
-```
-
-## 🌐 API Endpoints
-
-### Health Check
-```http
-GET /api/v1/health
-```
-**Response:**
-```json
-{
-  "status": "healthy",
-  "timestamp": "2025-07-26T15:29:30.469402",
-  "version": "1.0.0"
-}
-```
-
-### Get All Countries
-```http
-GET /api/v1/countries
-```
-**Response:**
-```json
-{
-  "success": true,
-  "count": 25,
-  "data": [
-    {
-      "id": 6,
-      "country_code": "ISR",
-      "country_name": "Israel",
-      "created_at": null,
-      "updated_at": null
-    }
-  ]
-}
-```
-
-### Check Coordinates
+#### Check Coordinate
 ```http
 POST /api/v1/check
 Content-Type: application/json
 
 {
-    "latitude": 31.7683,
-    "longitude": 35.2137,
-    "country_code": "ISR"
+  "latitude": 40.7128,
+  "longitude": -74.0060,
+  "country_code": "USA"
 }
 ```
-**Response:**
+
+Response:
 ```json
 {
   "success": true,
   "data": {
     "is_inside_country": true,
-    "latitude": 31.7683,
-    "longitude": 35.2137,
-    "country_code": "ISR",
-    "country_name": "Israel",
-    "checked_at": "2025-07-26T15:30:15.123456"
+    "latitude": 40.7128,
+    "longitude": -74.0060,
+    "country_code": "USA",
+    "country_name": "United States",
+    "checked_at": "2025-07-29T18:15:30.123456"
   }
 }
 ```
 
-### Add New Country
+#### Get Countries
 ```http
-POST /api/v1/countries
-Content-Type: application/json
+GET /api/v1/countries
+```
 
+#### Service Status
+```http
+GET /api/v1/status
+```
+
+#### Initialize Database
+```http
+POST /api/v1/init-db
+```
+
+## Admin Portal
+
+Access the admin portal at `/admin` to manage your country database.
+
+### Admin Features
+
+- **Dashboard**: Overview with statistics and quick actions
+- **Country Management**: Add, remove, and view countries with polygon data
+- **Admin Management**: Add and remove admin users
+- **Database Tools**: Initialize and clean database
+- **Secure Authentication**: Login system with session management
+
+### Admin Routes
+
+| Route | Method | Description |
+|-------|--------|-------------|
+| `/admin` | GET | Admin portal dashboard |
+| `/admin/login` | GET/POST | Admin login page |
+| `/admin/logout` | GET | Logout and redirect |
+| `/admin/add-country` | POST | Add new country with polygon |
+| `/admin/remove-country` | POST | Remove country by code |
+| `/admin/add-admin` | POST | Create new admin user |
+| `/admin/remove-admin` | POST | Remove admin user |
+| `/admin/admins` | GET | List all admin users |
+| `/admin/clean-db` | POST | Clear all country data |
+| `/admin/init-admins` | POST | Initialize admin table |
+| `/admin/stats` | GET | Get database statistics |
+
+### Admin Setup
+
+1. **Initialize Admin Table** (first time only):
+   ```bash
+   curl -X POST https://poetic-elegance-production-2172.up.railway.app/admin/init-admins
+   ```
+
+2. **Login**: Go to `/admin` and use the default credentials
+3. **Manage**: Use the web interface to add countries and manage users
+
+## Country Data Format
+
+Countries are stored with GeoJSON polygon data:
+
+```json
 {
-    "country_code": "NLD",
-    "country_name": "Netherlands",
-    "polygon_data": "{\"type\":\"Polygon\",\"coordinates\":[[[3.4,50.8],[7.2,50.8],[7.2,53.6],[3.4,53.6],[3.4,50.8]]]}"
+  "country_code": "USA",
+  "country_name": "United States",
+  "polygon_data": "{\"type\": \"Polygon\", \"coordinates\": [[[-125, 25], [-66, 25], [-66, 49], [-125, 49], [-125, 25]]]}"
 }
 ```
 
-## 🗄️ Database
+## �️ Local Development
 
-The service includes **25+ countries** with their boundary polygons:
-- 🇺🇸 USA, 🇨🇦 Canada, 🇲🇽 Mexico
-- 🇮🇱 Israel, 🇩🇪 Germany, 🇫🇷 France, 🇬🇧 UK
-- 🇯🇵 Japan, 🇨🇳 China, 🇮🇳 India
-- 🇦🇺 Australia, 🇧🇷 Brazil, 🇷🇺 Russia
-- And many more...
+### Prerequisites
+- Python 3.9+
+- PostgreSQL
+- Git
 
-### Auto-Load More Countries
-```bash
-# Load countries automatically from external APIs
-python server/auto_loader.py natural-earth    # ~250 countries
-python server/auto_loader.py nominatim 50     # 50 countries from OpenStreetMap
-```
+### Setup
 
-## 🚀 Deployment Options
+1. **Clone Repository**
+   ```bash
+   git clone https://github.com/lironbar1219/IsInCountry_server.git
+   cd IsInCountry_server
+   ```
+
+2. **Install Dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Environment Variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your database URL and secret key
+   ```
+
+4. **Run Server**
+   ```bash
+   cd server
+   python app.py
+   ```
+
+5. **Initialize Database**
+   ```bash
+   # Add sample countries
+   curl -X POST http://localhost:5000/api/v1/init-db
+
+   # Setup admin access
+   curl -X POST http://localhost:5000/admin/init-admins
+   ```
+
+## Deployment
 
 ### Railway (Recommended)
-```bash
-./deploy.sh  # Choose option 1
+
+1. **Connect Repository**: Link your GitHub repo to Railway
+2. **Environment Variables**: Set `DATABASE_URL` and `SECRET_KEY`
+3. **Deploy**: Railway automatically deploys from your main branch
+
+The service includes:
+- `Procfile` for Railway deployment
+- `requirements.txt` for Python dependencies
+- `Dockerfile` for containerization
+- Health checks and monitoring
+
+## Database Schema
+
+### Countries Table
+```sql
+CREATE TABLE countries (
+    id SERIAL PRIMARY KEY,
+    country_code VARCHAR(3) UNIQUE NOT NULL,
+    country_name VARCHAR(100) NOT NULL,
+    polygon_data TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
 ```
 
-### Manual Deployment
-1. **Render**: Free PostgreSQL + Web Service
-2. **Heroku**: Classic choice with add-ons
-3. **Vercel**: Serverless (requires DB modifications)
-4. **AWS/GCP**: Full control
-
-See `DEPLOYMENT.md` for detailed instructions.
-
-## 🧪 Testing
-
-### Test API Locally
-```bash
-cd server
-python data_loader.py test
+### Admins Table
+```sql
+CREATE TABLE admins (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(80) UNIQUE NOT NULL,
+    email VARCHAR(120) UNIQUE,
+    password_hash VARCHAR(128) NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
 ```
 
-### Manual API Testing
-```bash
-# Health check
-curl http://localhost:5000/api/v1/health
+## Security Features
 
-# Get countries
-curl http://localhost:5000/api/v1/countries
+- **Password Hashing**: Uses bcrypt for secure password storage
+- **Session Management**: Flask-Login for admin authentication
+- **Input Validation**: Comprehensive validation for all endpoints
+- **CORS Configuration**: Configurable cross-origin resource sharing
+- **SQL Injection Protection**: SQLAlchemy ORM prevents injection attacks
 
-# Test Jerusalem, Israel
-curl -X POST http://localhost:5000/api/v1/check \
-  -H "Content-Type: application/json" \
-  -d '{"latitude": 31.7683, "longitude": 35.2137, "country_code": "ISR"}'
+## Error Handling
 
-# Test New York, USA
-curl -X POST http://localhost:5000/api/v1/check \
-  -H "Content-Type: application/json" \
-  -d '{"latitude": 40.7128, "longitude": -74.0060, "country_code": "USA"}'
+The API returns consistent error responses:
+
+```json
+{
+  "success": false,
+  "error": "Error description"
+}
 ```
 
-## 📊 Supported Countries
+Common HTTP status codes:
+- `200`: Success
+- `400`: Bad Request (validation errors)
+- `401`: Unauthorized (admin routes)
+- `404`: Not Found
+- `500`: Server Error
 
-Currently includes 25+ countries with more available via auto-loader:
+## Integration Example
 
-| Code | Country | Code | Country |
-|------|---------|------|---------|
-| USA | United States | ISR | Israel |
-| CAN | Canada | DEU | Germany |
-| MEX | Mexico | ITA | Italy |
-| GBR | United Kingdom | ESP | Spain |
-| FRA | France | JPN | Japan |
-| CHN | China | IND | India |
-| AUS | Australia | BRA | Brazil |
-| RUS | Russia | ZAF | South Africa |
-| EGY | Egypt | TUR | Turkey |
-| ARG | Argentina | NLD | Netherlands |
-| CHE | Switzerland | SWE | Sweden |
-| NOR | Norway | DNK | Denmark |
-| POL | Poland | ... | and more |
+```python
+import requests
 
-## 🔧 Configuration
+# Check if coordinates are in a country
+response = requests.post('https://poetic-elegance-production-2172.up.railway.app/api/v1/check', json={
+    "latitude": 40.7128,
+    "longitude": -74.0060,
+    "country_code": "USA"
+})
+
+result = response.json()
+if result['success']:
+    print(f"Is inside {result['data']['country_name']}: {result['data']['is_inside_country']}")
+```
+
+## Configuration
 
 ### Environment Variables
 ```bash
 DATABASE_URL=postgresql://user:pass@host:port/db
 SECRET_KEY=your-secret-key
 FLASK_ENV=production
-FLASK_DEBUG=False
 PORT=5000
-CORS_ORIGINS=*
 ```
 
 ### Local Development (.env file)
@@ -218,243 +251,27 @@ FLASK_ENV=development
 FLASK_DEBUG=True
 ```
 
-## 🏗️ Algorithm
+## Testing
 
-The service uses **Shapely** library for geometric operations:
-
-1. **Point-in-Polygon Algorithm**: Uses ray casting algorithm
-2. **Polygon Support**: Handles both simple polygons and multi-polygons
-3. **Coordinate System**: WGS84 (latitude/longitude)
-4. **Performance**: Optimized for real-time queries
-
-## 📚 Client SDKs
-
-This API service can be consumed by various client libraries:
-
-- **Android SDK**: `isincountry-android` (separate repository)
-- **iOS SDK**: `isincountry-ios` (future)
-- **JavaScript SDK**: `isincountry-js` (future)
-- **Python Client**: Direct HTTP requests
-
-### Example Android Usage
-```java
-// In your Android app
-IsInCountrySDK sdk = new IsInCountrySDK(context, "https://your-api.railway.app/api/v1/");
-sdk.isInCountry("ISR", callback);
-```
-
-## 📖 API Documentation
-
-### Error Responses
-```json
-{
-  "success": false,
-  "error": "Country with code XYZ not found"
-}
-```
-
-### Status Codes
-- `200` - Success
-- `400` - Bad Request (invalid input)
-- `404` - Not Found (country not found)
-- `405` - Method Not Allowed
-- `500` - Internal Server Error
-
-## 🔗 Related Projects
-
-- **Android SDK**: [isincountry-android](https://github.com/yourusername/isincountry-android)
-- **Example Apps**: [isincountry-examples](https://github.com/yourusername/isincountry-examples)
-- **Documentation**: [GitHub Pages](https://yourusername.github.io/isincountry-api)
-
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) file for details.
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make changes
-4. Test thoroughly
-5. Submit a pull request
-
----
-
-**Ready to deploy?** Run `./deploy.sh` and choose your preferred cloud provider!
-
-## 📁 Project Structure
-
-```
-isincountry-sdk/
-├── server/                 # Python Flask API
-│   ├── app.py             # Main Flask application
-│   ├── data_loader.py     # Load country data
-│   ├── auto_loader.py     # Auto-fetch countries from APIs
-│   └── requirements.txt   # Python dependencies
-├── android-library/       # Android library
-│   └── src/main/java/com/isincountry/sdk/
-├── android-example/       # Example Android app
-├── docs/                  # Documentation
-└── deployment files       # Cloud deployment configs
-```
-
-## 🌐 API Endpoints
-
-Once deployed, your API provides:
-
-### Health Check
-```http
-GET /api/v1/health
-```
-
-### Get All Countries
-```http
-GET /api/v1/countries
-```
-
-### Check Coordinates
-```http
-POST /api/v1/check
-Content-Type: application/json
-
-{
-    "latitude": 31.7683,
-    "longitude": 35.2137,
-    "country_code": "ISR"
-}
-```
-
-## �️ Database
-
-The service includes **25+ countries** with their boundary polygons:
-- 🇺🇸 USA, 🇨🇦 Canada, 🇲🇽 Mexico
-- 🇮🇱 Israel, 🇩🇪 Germany, 🇫🇷 France, 🇬🇧 UK
-- 🇯🇵 Japan, 🇨🇳 China, 🇮🇳 India
-- 🇦🇺 Australia, 🇧🇷 Brazil, 🇷🇺 Russia
-- And many more...
-
-### Auto-Load More Countries
+### API Testing Examples
 ```bash
-# Load countries automatically from external APIs
-python server/auto_loader.py natural-earth    # ~250 countries
-python server/auto_loader.py nominatim 50     # 50 countries from OpenStreetMap
-```
+# Health check
+curl http://localhost:5000/api/v1/health
 
-## 🚀 Deployment Options
+# Get all countries
+curl http://localhost:5000/api/v1/countries
 
-### Railway (Recommended)
-```bash
-./deploy.sh  # Choose option 1
-```
-
-### Manual Deployment
-1. **Render**: Free PostgreSQL + Web Service
-2. **Heroku**: Classic choice with add-ons
-3. **Vercel**: Serverless (requires DB modifications)
-4. **AWS/GCP**: Full control
-
-See `DEPLOYMENT.md` for detailed instructions.
-
-## 📱 Android Integration
-
-### Basic Usage
-```java
-IsInCountrySDK sdk = new IsInCountrySDK(context);
-
-// Check current country (based on device locale)
-sdk.isInCurrentCountry(callback);
-
-// Check specific country
-sdk.isInCountry("USA", callback);
-
-// Check specific coordinates
-sdk.checkCoordinatesInCountry(40.7128, -74.0060, "USA", callback);
-```
-
-### Advanced Usage
-```java
-// Get all available countries
-sdk.getAvailableCountries(new CountriesCallback() {
-    @Override
-    public void onResult(List<Country> countries) {
-        // Display countries list
-    }
-});
-```
-
-## 🧪 Testing
-
-### Test API Locally
-```bash
-cd server
-python data_loader.py test
-```
-
-### Test Coordinates
-```bash
-# Test Jerusalem, Israel
+# Test Jerusalem, Israel coordinates
 curl -X POST http://localhost:5000/api/v1/check \
   -H "Content-Type: application/json" \
   -d '{"latitude": 31.7683, "longitude": 35.2137, "country_code": "ISR"}'
 ```
 
-## 📊 Supported Countries
-
-Currently includes 25+ countries with more available via auto-loader:
-
-| Code | Country | Code | Country |
-|------|---------|------|---------|
-| USA | United States | ISR | Israel |
-| CAN | Canada | DEU | Germany |
-| MEX | Mexico | ITA | Italy |
-| GBR | United Kingdom | ESP | Spain |
-| FRA | France | JPN | Japan |
-| CHN | China | IND | India |
-| AUS | Australia | BRA | Brazil |
-| RUS | Russia | ... | and more |
-
-## 🔧 Configuration
-
-### Environment Variables
-```bash
-DATABASE_URL=postgresql://user:pass@host:port/db
-SECRET_KEY=your-secret-key
-FLASK_ENV=production
-PORT=5000
-```
-
-### Android Permissions
-```xml
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-<uses-permission android:name="android.permission.INTERNET" />
-```
-
-## 📚 Documentation
-
-- [Deployment Guide](DEPLOYMENT.md)
-- [API Documentation](docs/api.md)
-- [Android Library Guide](docs/android.md)
-- [Contributing](CONTRIBUTING.md)
-
-## 🔗 Links
-
-- **API Service**: Deploy to cloud provider
-- **Android Library**: Publish to JitPack
-- **Example App**: Demo application
-- **Documentation**: GitHub Pages
-
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) file for details.
-
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
-3. Make changes
-4. Test thoroughly
-5. Submit a pull request
+3. Make your changes and test thoroughly
+4. Submit a pull request
 
 ---
-
-**Ready to deploy?** Run `./deploy.sh` and choose your preferred cloud provider!
